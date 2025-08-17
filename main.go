@@ -2,13 +2,15 @@ package main
 
 import (
 	_ "image/jpeg"
+	_ "image/png"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type game struct {
-	bg *ebiten.Image
+	bg     *ebiten.Image
+	person *ebiten.Image
 }
 
 func newGame() (*game, error) {
@@ -20,7 +22,13 @@ func newGame() (*game, error) {
 		return nil, err
 	}
 	g.bg = img
-	w, h := img.Bounds().Dx(), img.Bounds().Dy()
+	img, _, err = ebitenutil.NewImageFromFile("person.png")
+	if err != nil {
+		return nil, err
+	}
+	g.person = img
+
+	w, h := g.bg.Bounds().Dx(), g.bg.Bounds().Dy()
 	ebiten.SetWindowSize(w, h) // ← ウィンドウを画像サイズに
 	// もし拡大縮小なしの固定内部解像度にしたいなら：
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeDisabled)
@@ -36,6 +44,9 @@ func (g *game) Draw(screen *ebiten.Image) {
 	// 画像を描画
 	op := &ebiten.DrawImageOptions{}
 	screen.DrawImage(g.bg, op)
+
+	op = &ebiten.DrawImageOptions{}
+	screen.DrawImage(g.person, op)
 }
 
 func (g *game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
